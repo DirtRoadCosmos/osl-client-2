@@ -33,24 +33,49 @@ const DisplayPlayer = ({ player }) => {
 
 const PlayerForm = ({ onAddPlayer }) => {
   const emptyPlayer = {
-    ones: "",
-    twos: "",
-    threes: "",
-    fours: "",
-    fives: "",
-    sixes: "",
-    topSub: "",
-    topBonus: "",
-    topTotal: "",
+    ones: 0,
+    twos: 0,
+    threes: 0,
+    fours: 0,
+    fives: 0,
+    sixes: 0,
+    topSubtotal: 0,
+    topBonus: 0,
+    topTotal: 0,
   };
 
   const [newPlayer, setNewPlayer] = useState(emptyPlayer);
 
   const handlePlayerChange = (event) => {
     const key = event.target.name;
-    const value = event.target.value;
+    const value = Number(event.target.value);
     const updatedPlayer = { ...newPlayer, [key]: value };
-    setNewPlayer(updatedPlayer);
+    // Debugging code:
+    console.log("updatedPlayer:", updatedPlayer);
+
+    const topSubtotal =
+      updatedPlayer.ones +
+      updatedPlayer.twos +
+      updatedPlayer.threes +
+      updatedPlayer.fours +
+      updatedPlayer.fives +
+      updatedPlayer.sixes;
+    const topBonus = topSubtotal >= 63 ? 35 : 0;
+    const topTotal = topSubtotal + topBonus;
+    // More debugging code:
+    console.log(
+      "topSubtotal, topBonus, topTotal:",
+      topSubtotal,
+      topBonus,
+      topTotal
+    );
+
+    setNewPlayer({
+      ...updatedPlayer,
+      topSubtotal: topSubtotal,
+      topBonus: topBonus,
+      topTotal: topTotal,
+    });
   };
 
   const handleSubmit = (event) => {
@@ -66,9 +91,54 @@ const PlayerForm = ({ onAddPlayer }) => {
       <div>
         <FormField
           name="ones"
-          label="1s"
-          value={newPlayer["ones"]}
+          value={newPlayer.ones}
+          label="count and add only 1s"
           handleChange={handlePlayerChange}
+        />
+        <FormField
+          name="twos"
+          label="count and add only 2s"
+          value={newPlayer["twos"]}
+          handleChange={handlePlayerChange}
+        />
+        <FormField
+          name="threes"
+          label="count and add only 3s"
+          value={newPlayer["threes"]}
+          handleChange={handlePlayerChange}
+        />
+        <FormField
+          name="fours"
+          label="count and add only 4s"
+          value={newPlayer["fours"]}
+          handleChange={handlePlayerChange}
+        />
+        <FormField
+          name="fives"
+          label="count and add only 5s"
+          value={newPlayer["fives"]}
+          handleChange={handlePlayerChange}
+        />
+        <FormField
+          name="sixes"
+          label="count and add only 6s"
+          value={newPlayer["sixes"]}
+          handleChange={handlePlayerChange}
+        />
+        <FormField
+          name="topSubtotal"
+          label="Top Subtotal"
+          value={newPlayer["topSubtotal"]}
+        />
+        <FormField
+          name="topBonus"
+          label="Top Bonus"
+          value={newPlayer["topBonus"]}
+        />
+        <FormField
+          name="topTotal"
+          label="Top Total"
+          value={newPlayer["topTotal"]}
         />
       </div>
       <div>
@@ -79,10 +149,16 @@ const PlayerForm = ({ onAddPlayer }) => {
 };
 
 const FormField = ({ name, label, value, handleChange }) => {
+  const [hasInteracted, setHasInteracted] = useState(false);
+
   const isCalculated = () => {
     return (
-      label === "Top Subtotal" || label === "Bonus" || label === "Top Total"
+      label === "Top Subtotal" || label === "Top Bonus" || label === "Top Total"
     );
+  };
+
+  const handleFocus = (event) => {
+    event.target.select();
   };
 
   return (
@@ -93,6 +169,7 @@ const FormField = ({ name, label, value, handleChange }) => {
             name={name}
             value={value}
             onChange={handleChange}
+            onFocus={handleFocus}
             disabled={isCalculated()}
           />
         </FloatingLabel>
